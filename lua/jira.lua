@@ -378,18 +378,42 @@ end
 -- Update and populate floating window with Jira issues
 tbl_issue_states = {}
 function prepare_tbl_issues_states()
-	tbl_issue_states["In_progress"] = 1
-	tbl_issue_states["To_do"] = 2
-	tbl_issue_states["Ready for test"]= 5
-	tbl_issue_states["Testing"] = 9
-	tbl_issue_states["Release candidate"] = 11
-	tbl_issue_states["Hold"] = 90
-	tbl_issue_states["Done"] = 100
+
+	local states = os.getenv("JIRA_ISSUE_STATES")
+	
+	local idx = 1
+	for line in states:gmatch("([^\n]*)\n?") do
+		tbl_issue_states[line] = idx
+		idx = idx + 1
+	end
+
 end
+
 prepare_tbl_issues_states()
 
 function sort_issue(k1, k2)
-    return tbl_issue_states[k1.fields.status.name] < tbl_issue_states[k2.fields.status.name]   
+    local state1 = tbl_issue_states[k1.fields.status.name]
+    local state2 = tbl_issue_states[k2.fields.status.name]
+    -- print("processing states: ", state1, " & ", state2)
+    if state1 == nil then state1 = -1 end
+    if state2 == nil then state2 = -1 end
+    return state1 < state2
+end
+
+symbol_tbl = {}
+function prepare_symbol_table()
+	local t = symbol_tbl
+	t["Bug"] = "🐞"
+	t["Story"] = "🧳"
+	t["Task"] = "📋"
+	t["Sub-task"] = "📝"
+end
+prepare_symbol_table()
+
+function get_issue_symbol(name)
+    local symbol = symbol_tbl[name]
+    if symbol == nil then return name end
+    return symbol
 end
 
 function update_view(direction)
@@ -408,7 +432,7 @@ function update_view(direction)
     -- print(dump(results))
     for idx, issue in ipairs(results) do
         issue_line = string.format('%7s | %8s | %8s | <%s> | %s [%s]',
-		issue.key, issue.fields.issuetype.name, issue.fields.priority.name, issue.fields.assignee.displayName, issue.fields.summary, issue.fields.status.name)
+		issue.key, get_issue_symbol(issue.fields.issuetype.name), issue.fields.priority.name, issue.fields.assignee.displayName, issue.fields.summary, issue.fields.status.name)
         result[idx] = issue_line
     end
     api.nvim_buf_set_lines(buf, 3, -1, false, result)
