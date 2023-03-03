@@ -364,7 +364,7 @@ function open_window()
     vim.api.nvim_win_set_option(win, 'cursorline', true)
 
     api.nvim_buf_set_lines(buf, 0, -1, false, { center('My Jira'), '', ''})
-    -- api.nvim_command('set nofoldenable')
+    api.nvim_command('set nofoldenable')
     api.nvim_buf_add_highlight(buf, -1, 'WhidHeader', 0, 0, -1)
 end
 
@@ -430,9 +430,13 @@ function update_view(direction)
 
     local result = {}
     -- print(dump(results))
+    local width = 70
     for idx, issue in ipairs(results) do
-        issue_line = string.format('%7s | %8s | %8s | <%s> | %s [%s]',
-		issue.key, get_issue_symbol(issue.fields.issuetype.name), issue.fields.priority.name, issue.fields.assignee.displayName, issue.fields.summary, issue.fields.status.name)
+	local issue_summary = issue.fields.summary
+	if #issue_summary > width then issue_summary = issue_summary:sub(1, width) .. "..." end
+        issue_line = string.format('   %7s | %8s | %8s | <%s> | %s [%s] ',
+		issue.key, get_issue_symbol(issue.fields.issuetype.name), issue.fields.priority.name, issue.fields.assignee.displayName,
+		issue_summary, issue.fields.status.name)
         result[idx] = issue_line
     end
     api.nvim_buf_set_lines(buf, 3, -1, false, result)
