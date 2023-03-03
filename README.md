@@ -34,9 +34,11 @@ Installation
   Eg: `export JIRA_HOST="https://example.atlassian.net"`
 
 * Set Jira project as `JIRA_PROJECT` environment variable
+
   Eg: `export JIRA_PROJECT="Some project"`
 
 * Set Jira issue status sort order as `JIRA_ISSUE_STATES` environment variable
+
   Eg: `export JIRA_ISSUE_STATES="$(echo -en 'to_do\nin_progress\ntesting\ndone')"`
   Eg: `export JIRA_ISSUE_STATES="$(cat issue_states)"`
 
