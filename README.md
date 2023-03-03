@@ -40,6 +40,7 @@ Installation
 * Set Jira issue status sort order as `JIRA_ISSUE_STATES` environment variable
 
   Eg: `export JIRA_ISSUE_STATES="$(echo -en 'to_do\nin_progress\ntesting\ndone')"`
+  
   Eg: `export JIRA_ISSUE_STATES="$(cat issue_states)"`
 
 * Install `lua-cjson` (using luarocks: `luarocks install lua-cjson`)
